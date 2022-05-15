@@ -806,3 +806,22 @@ img {
   background: #f64749;
   color: rgb(13, 13, 65);
 }
+
+.file-input-label {
+  border: black 2px dotted;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 50px;
+  background-color: black;
+  color: white;
+}
+.label-container {
+  display: flex;
+  justify-content: center;
+  background-color: #cccccc;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+.buy-the-look-desc {
+  margin-left: 20px;
+}
