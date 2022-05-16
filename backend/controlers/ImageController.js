@@ -11,6 +11,7 @@ function _base64ToArrayBuffer(base64) {
 }
 const processImage = async (req, res) => {
   const stub = ClarifaiStub.grpc();
+  const stub2 = ClarifaiStub.grpc();
   const file = req.body.file;
 
   // This will be used by every Clarifai endpoint call.
@@ -57,8 +58,48 @@ const processImage = async (req, res) => {
           products = [...products, ...newProducts];
         }
       }
-      // console.log(products);
-      res.send(products);
+      stub2.PostModelOutputs(
+        {
+          model_id: "color-recognition",
+          version_id: "dd9458324b4b45c2be1a7ba84d27cd04", // This is optional. Defaults to the latest model version.
+          inputs: [
+            {
+              data: {
+                image: {
+                  base64: file,
+                },
+              },
+            },
+          ],
+        },
+        metadata,
+        async (err, response) => {
+          if (err) {
+            throw new Error(err);
+          }
+
+          if (response.status.code !== 10000) {
+            throw new Error(
+              "Post model outputs failed, status: " +
+                response.status.description
+            );
+          }
+
+          // Since we have one input, one output will exist here.
+          const output = response.outputs[0];
+          console.log(output.data.colors);
+          console.log(products);
+
+          products = products.filter((product) => {
+            return output.data.colors.some((color) => {
+              console.log(color.w3c.name);
+              return product.category.includes(color.w3c.name);
+            });
+          });
+
+          res.send(products);
+        }
+      );
     }
   );
 };
